@@ -22,6 +22,33 @@ const MyAccount = () => {
         dispatch({ type: "LOGOUT" });
     };
 
+    const handleDeleteAccount = async () => {
+        const confirmation = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
+
+        if (confirmation) {
+            try {
+                const response = await fetch(`${BASE_URL}/users/delete-account`, {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`, // assuming JWT stored in localStorage
+                    },
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert(data.message);  // Success message
+                    handleLogout();  // Log out the user after successful account deletion
+                } else {
+                    alert(data.message || "Failed to delete account");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("An error occurred while deleting the account");
+            }
+        }
+    };
+
     return (
         <section>
             <div className="max-w-[1170px] px-5 mx-auto">
@@ -57,7 +84,7 @@ const MyAccount = () => {
                                 <button onClick={handleLogout} className="w-full bg-[#181A1E] p-3 text-[16px] leading-7 rounded-md text-white">
                                     Logout
                                 </button>
-                                <button className="w-full bg-red-600 mt-4 p-3 text-[16px] leading-7 rounded-md text-white">
+                                <button onClick={handleDeleteAccount} className="w-full bg-red-600 mt-4 p-3 text-[16px] leading-7 rounded-md text-white">
                                     Delete account
                                 </button>
                             </div>

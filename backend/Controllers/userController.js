@@ -1,4 +1,3 @@
-
 // import mongoose from "mongoose";
 import User from "../models/UserSchema.js";
 import Booking from "../models/BookingSchema.js";
@@ -6,27 +5,6 @@ import Doctor from "../models/DoctorSchema.js"
 
 // Create a User model using the schema
 // const User = mongoose.model('User', UserSchema);
-
-// Update user
-// export const updateUser = async (req, res) => {
-//     const id = req.params.id
-//     try {
-//         const updatedUser = await User.findByIdAndUpdate(
-//             id,
-//             { $set: req.body },
-//             { new: true }
-//         );
-
-//         res.status(200).json({
-//             success: true,
-//             message: 'Successfully updated',
-//             data: updatedUser,
-//         });
-
-//     } catch (err) {
-//         res.status(500).json({ success: false, message: 'Failed to update' });
-//     }
-// };
 
 export const updateUser = async (req, res) => {
     const id = req.params.id;
@@ -54,14 +32,21 @@ export const updateUser = async (req, res) => {
 
 // Delete user
 export const deleteUser = async (req, res) => {
-    const id = req.params.id;
     try {
-        await User.findByIdAndDelete(id);
+        // Use the authenticated user's ID from the token
+        const userId = req.userId; // Assuming the user ID is stored in the req object after JWT authentication
+
+        // Find and delete the user by their authenticated ID
+        const user = await User.findByIdAndDelete(userId);
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
         res.status(200).json({
             success: true,
-            message: "Sucessfully Deleted",
+            message: "Successfully Deleted",
         });
-
     } catch (err) {
         res.status(500).json({ success: false, message: "Failed to delete" });
     }

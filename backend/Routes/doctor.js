@@ -25,7 +25,11 @@ router.get("/", getAllDoctor);
 router.put("/:id", authenticate, restrict(["doctor"]), updateDoctor);
 
 // Route to delete a doctor by ID
-router.delete("/:id", authenticate, restrict(["doctor"]), deleteDoctor);
+// router.delete("/:id", authenticate, restrict(["doctor"]), deleteDoctor);
+
+// Route to delete a doctor by their ID
+router.delete("/delete-account", authenticate, restrict(["doctor"]), deleteDoctor);
+
 
 router.get("/profile/me", authenticate, restrict(["doctor"]), getDoctorProfile);
 
