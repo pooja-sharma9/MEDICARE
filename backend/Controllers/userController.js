@@ -2,31 +2,67 @@
 import User from "../models/UserSchema.js";
 import Booking from "../models/BookingSchema.js";
 import Doctor from "../models/DoctorSchema.js"
+import bcrypt from 'bcryptjs';
 
 // Create a User model using the schema
 // const User = mongoose.model('User', UserSchema);
 
+// export const updateUser = async (req, res) => {
+//     const id = req.params.id;
+//     try {
+//         const updatedUser = await User.findByIdAndUpdate(
+//             id,
+//             { $set: req.body },
+//             { new: true }
+//         );
+
+//         if (!updatedUser) {
+//             return res.status(404).json({ success: false, message: 'User not found' });
+//         }
+
+//         res.status(200).json({
+//             success: true,
+//             message: 'Successfully updated',
+//             data: updatedUser,
+//         });
+
+//     } catch (err) {
+//         res.status(500).json({ success: false, message: 'Failed to update', error: err.message });
+//     }
+// };
+
 export const updateUser = async (req, res) => {
     const id = req.params.id;
-    try {
-        const updatedUser = await User.findByIdAndUpdate(
-            id,
-            { $set: req.body },
-            { new: true }
-        );
 
-        if (!updatedUser) {
+    try {
+        // Fetch the user by ID
+        const user = await User.findById(id);
+        if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
+
+        // Check if the password is being updated
+        if (req.body.password) {
+            // Hash the new password
+            const hashedPassword = await bcrypt.hash(req.body.password, 12);
+            req.body.password = hashedPassword;
+        }
+
+        // Update the user's fields
+        Object.assign(user, req.body); // Merge req.body into the user object
+        const updatedUser = await user.save();
 
         res.status(200).json({
             success: true,
             message: 'Successfully updated',
             data: updatedUser,
         });
-
     } catch (err) {
-        res.status(500).json({ success: false, message: 'Failed to update', error: err.message });
+        res.status(500).json({
+            success: false,
+            message: 'Failed to update',
+            error: err.message,
+        });
     }
 };
 
