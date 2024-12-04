@@ -29,9 +29,13 @@ export const register = async (req, res) => {
             return res.status(400).json({ message: 'User already exists' });
         }
 
+        // // Hash password
+        // const salt = await bcrypt.genSalt(10);
+        // const hashPassword = await bcrypt.hash(password, salt);
+
         // Hash password
-        const salt = await bcrypt.genSalt(10);
-        const hashPassword = await bcrypt.hash(password, salt);
+        const hashPassword = await bcrypt.hash(password, 10);
+
 
         if (role === 'patient') {
             user = new User({
@@ -88,7 +92,7 @@ export const login = async (req, res) => {
         console.log(bcrypt.compare); // Debugging line to check the function type
 
         // Compare the password (make sure to await the comparison)
-        const isPasswordMatch = await bcrypt.compare(password, user.password); // Ensure this line is awaited properly
+        const isPasswordMatch = bcrypt.compare(password, user.password); // Ensure this line is awaited properly
 
         if (!isPasswordMatch) {
             return res.status(400).json({ status: false, message: 'Invalid Credentials' });
